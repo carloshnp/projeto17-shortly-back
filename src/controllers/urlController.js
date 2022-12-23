@@ -25,12 +25,28 @@ export async function shortenUrl(req, res) {
 }
 
 export async function getShortenedUrl(req, res) {
-  const url = res.locals.search;
-  res.send(url).status(201);
+  const {id, url, shortUrl} = res.locals.search;
+  const obj = {
+    id,
+    url,
+    shortUrl
+  }
+  res.send(obj).status(201);
 }
 
 export async function redirectToShortenedUrl(req, res) {
   const { url } = res.locals.shortenedUrl;
   console.log(url);
-  res.redirect(url)
+  res.redirect(url);
+}
+
+export async function deleteShortenedUrl(req, res) {
+  const { id } = res.locals.search;
+  try {
+    await connection.query("DELETE FROM urls WHERE id=$1", [id]);
+    return res.sendStatus(204);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
 }

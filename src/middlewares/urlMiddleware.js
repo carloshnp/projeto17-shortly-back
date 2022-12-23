@@ -39,7 +39,7 @@ export async function shortenedUrlExists(req, res, next) {
   const { id } = req.params;
   try {
     const idExists = await connection.query(
-      `SELECT id, url, "shortUrl" FROM urls WHERE id=$1;`,
+      `SELECT id, url, "shortUrl", "userId" FROM urls WHERE id=$1;`,
       [id]
     );
     if (!idExists.rows[0]) {
@@ -71,16 +71,29 @@ export async function validateShortenedUrl(req, res, next) {
   }
 }
 
-export async function updateVisitCount(req,res,next){
-  const {id} = res.locals.shortenedUrl
+export async function updateVisitCount(req, res, next) {
+  const { id } = res.locals.shortenedUrl;
   try {
     await connection.query(
       `UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1;`,
       [id]
-    )
+    );
     next();
   } catch (error) {
     console.log(error);
-    res.sendStatus(500)
+    res.sendStatus(500);
   }
+}
+
+export async function isShortenedUrlFromUser(req, res, next) {
+  const token = res.locals.auth;
+  const { userId } = res.locals.search;
+  const query = await connection.query(
+    `SELECT "userId" FROM sessions WHERE token=$1;`,
+    [token]
+  );
+  if (query.rows[0].userId !== userId) {
+    return res.sendStatus(401);
+  }
+  next();
 }

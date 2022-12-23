@@ -6,6 +6,7 @@ import {
   shortenUrl,
 } from "../controllers/urlController.js";
 import {
+  isShortenedUrlFromUser,
   shortenedUrlExists,
   updateVisitCount,
   validateShortenedUrl,
@@ -17,7 +18,18 @@ const router = Router();
 
 router.post("/urls/shorten", validateToken, validateUrl, shortenUrl);
 router.get("/urls/:id", shortenedUrlExists, getShortenedUrl);
-router.get("/urls/open/:shortUrl", validateShortenedUrl, updateVisitCount, redirectToShortenedUrl);
-router.delete('/urls/:id', validateToken, validateShortenedUrl, deleteShortenedUrl)
+router.get(
+  "/urls/open/:shortUrl",
+  validateShortenedUrl,
+  updateVisitCount,
+  redirectToShortenedUrl
+);
+router.delete(
+  "/urls/:id",
+  validateToken,
+  shortenedUrlExists,
+  isShortenedUrlFromUser,
+  deleteShortenedUrl
+);
 
 export default router;

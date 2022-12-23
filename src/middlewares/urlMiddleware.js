@@ -70,3 +70,17 @@ export async function validateShortenedUrl(req, res, next) {
     res.sendStatus(500);
   }
 }
+
+export async function updateVisitCount(req,res,next){
+  const {id} = res.locals.shortenedUrl
+  try {
+    await connection.query(
+      `UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1;`,
+      [id]
+    )
+    next();
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500)
+  }
+}

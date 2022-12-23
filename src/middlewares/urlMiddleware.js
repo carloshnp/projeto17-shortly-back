@@ -16,6 +16,7 @@ export async function validateToken(req, res, next) {
     return res.sendStatus(401);
   }
   res.locals.auth = token;
+  res.locals.userId = tokenExists.rows[0].userId;
   next();
 }
 
